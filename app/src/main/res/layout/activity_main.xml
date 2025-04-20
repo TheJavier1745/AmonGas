@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_soft"
+    android:padding="24dp">
+
+    <!-- Título de la app -->
+    <TextView
+        android:id="@+id/appTitle"
+        android:text="Vincula tu dispositivo para continuar"
+        android:textAlignment="center"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:textColor="@color/purple_500"
+        android:fontFamily="@font/amatic_sc"
+        android:shadowColor="#80000000"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="4"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <!-- Imagen de inicio -->
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:src="@drawable/logo_amongas"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Botón para vincular -->
+    <Button
+        android:id="@+id/btnConnect"
+        android:text="Vincular dispositivo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

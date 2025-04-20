@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AmonGas</string>
+    <string name="open">Abrir menú</string>
+    <string name="close">Cerrar menú</string>
+</resources>
