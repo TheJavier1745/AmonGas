@@ -4,12 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.appcompat.app.AppCompatActivity
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.ActionBarDrawerToggle
-import com.google.android.material.navigation.NavigationView
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.random.Random
 
 class SensorActivity : BaseActivity() {
@@ -17,7 +15,6 @@ class SensorActivity : BaseActivity() {
     private lateinit var tvStatus: TextView
     private lateinit var imageStatus: ImageView
     private val handler = Handler(Looper.getMainLooper())
-    private lateinit var drawerToggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,24 +24,29 @@ class SensorActivity : BaseActivity() {
         tvStatus = findViewById(R.id.tvStatus)
         imageStatus = findViewById(R.id.imageStatus)
 
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
-        val navView = findViewById<NavigationView>(R.id.navView)
+        updateGasLevel()
 
-        drawerToggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
-        drawerLayout.addDrawerListener(drawerToggle)
-        drawerToggle.syncState()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        navView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.nav_settings -> startActivity(Intent(this, SettingsActivity::class.java))
-                R.id.nav_history -> startActivity(Intent(this, HistoryActivity::class.java))
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    true
+                }
+                R.id.nav_history -> {
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                    true
+                }
+                R.id.nav_home -> {
+                    // Ya estás en home
+                    true
+                }
+                else -> false
             }
-            drawerLayout.closeDrawers()
-            true
         }
 
-        updateGasLevel()
+
     }
 
     private fun updateGasLevel() {
@@ -73,5 +75,4 @@ class SensorActivity : BaseActivity() {
             }
         }, 2000)
     }
-
 }
