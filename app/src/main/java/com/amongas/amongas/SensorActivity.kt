@@ -9,9 +9,8 @@ import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import kotlin.random.Random
 
 class SensorActivity : BaseActivity() {
@@ -21,7 +20,7 @@ class SensorActivity : BaseActivity() {
     private lateinit var chartGasLevels: LineChart
 
     private val handler = Handler(Looper.getMainLooper())
-    private val gasEntries = ArrayList<Entry>()
+    private val gasValues = mutableListOf<Float>()
     private var timeStep = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,30 +74,40 @@ class SensorActivity : BaseActivity() {
                 val gasLevel = Random.nextInt(0, 1001)
                 tvGasLevel.text = "Nivel de gas: $gasLevel"
                 timeStep += 1f
-                gasEntries.add(Entry(timeStep, gasLevel.toFloat()))
 
-                if (gasEntries.size > 20) gasEntries.removeAt(0)
+                // Guardar el nuevo valor, mantener solo los últimos 10
+                gasValues.add(gasLevel.toFloat())
+                if (gasValues.size > 10) gasValues.removeAt(0)
 
-                // Determinar color según el nivel
-                val lineColor = when {
-                    gasLevel <= 249 -> getColor(R.color.green)
-                    gasLevel in 250..499 -> getColor(R.color.yellow)
-                    else -> getColor(R.color.red)
+                // Crear un dataset por segmento (con valores visibles al final)
+                val dataSets = mutableListOf<ILineDataSet>()
+                for (i in 0 until gasValues.size - 1) {
+                    val entryStart = Entry(i.toFloat(), gasValues[i])
+                    val entryEnd = Entry((i + 1).toFloat(), gasValues[i + 1])
+
+                    val segmentColor = when {
+                        gasValues[i + 1] <= 249 -> getColor(R.color.green)
+                        gasValues[i + 1] in 250f..499f -> getColor(R.color.yellow)
+                        else -> getColor(R.color.red)
+                    }
+
+                    val segmentDataSet = LineDataSet(listOf(entryStart, entryEnd), "").apply {
+                        setDrawValues(true)              // ✅ Mostrar valor
+                        setDrawCircles(true)             // ✅ Círculo en punto
+                        valueTextSize = 10f              // ✅ Tamaño del valor
+                        circleRadius = 4f
+                        color = segmentColor
+                        setCircleColor(segmentColor)
+                        lineWidth = 3f
+                    }
+
+                    // Solo mostrar valor del último punto del segmento
+                    segmentDataSet.setDrawValues(true)
+
+                    dataSets.add(segmentDataSet)
                 }
 
-                // Crear dataset
-                val dataSet = LineDataSet(gasEntries, "Nivel de Gas").apply {
-                    setDrawValues(true) // Mostrar valor numérico
-                    setDrawCircles(true) // Mostrar puntos
-                    circleRadius = 4f
-                    lineWidth = 2f
-                    valueTextSize = 10f
-                    color = lineColor
-                    setCircleColor(lineColor)
-                    mode = LineDataSet.Mode.LINEAR
-                }
-
-                chartGasLevels.data = LineData(dataSet)
+                chartGasLevels.data = LineData(dataSets)
                 chartGasLevels.invalidate()
 
                 // Actualizar estado visual
@@ -120,7 +129,7 @@ class SensorActivity : BaseActivity() {
                     }
                 }
 
-                handler.postDelayed(this, 5000)
+                handler.postDelayed(this, 2000)
             }
         }, 0)
     }
