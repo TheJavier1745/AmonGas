@@ -36,7 +36,16 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:src="@drawable/normal_alto" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartGasLevels"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
     </LinearLayout>
+
 
     <!-- Menú inferior sin FAB -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
