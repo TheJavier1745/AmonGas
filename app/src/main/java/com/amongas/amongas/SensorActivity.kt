@@ -1,9 +1,8 @@
 package com.amongas.amongas
 
 import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.media.MediaPlayer
+import android.os.*
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -11,7 +10,6 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.random.Random
 
 class SensorActivity : BaseActivity() {
@@ -69,7 +67,6 @@ class SensorActivity : BaseActivity() {
                 else -> false
             }
         }
-
     }
 
     private fun updateGasLevel() {
@@ -110,6 +107,7 @@ class SensorActivity : BaseActivity() {
                 chartGasLevels.data = LineData(dataSets)
                 chartGasLevels.invalidate()
 
+                // Mostrar estado visual
                 when {
                     gasLevel <= 249 -> {
                         tvStatus.text = "Estado: Normal"
@@ -126,6 +124,31 @@ class SensorActivity : BaseActivity() {
                         tvStatus.setTextColor(getColor(R.color.red))
                         imageStatus.setImageResource(R.drawable.emergencia)
                     }
+                }
+
+                // Obtener configuración del usuario
+                val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+                val alertsEnabled = prefs.getBoolean("alerts_enabled", true)
+                val threshold = prefs.getInt("gas_threshold", 500)
+
+                if (alertsEnabled && gasLevel >= threshold) {
+                    // Vibración
+                    val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(
+                            VibrationEffect.createOneShot(
+                                500,
+                                VibrationEffect.DEFAULT_AMPLITUDE
+                            )
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(500)
+                    }
+
+                    // Sonido
+                    val mediaPlayer = MediaPlayer.create(this@SensorActivity, R.raw.alert_sound)
+                    mediaPlayer.start()
                 }
 
                 handler.postDelayed(this, 5000)
