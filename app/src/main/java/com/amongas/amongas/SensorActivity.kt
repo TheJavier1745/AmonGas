@@ -86,6 +86,18 @@ class SensorActivity : BaseActivity() {
         super.onResume()
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.selectedItemId = R.id.nav_home
+        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        val sensorName = prefs.getString("sensor_name", "Sensor")
+
+        // Actualiza el título si usás Toolbar
+        supportActionBar?.title = sensorName
+
+        // Actualiza el nombre en el TextView del layout (si existe)
+        val tvSensorName = findViewById<TextView?>(R.id.tvSensorName)
+        tvSensorName?.text = sensorName
+
+        // También aseguramos que la opción "Inicio" esté seleccionada
+        findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.nav_home
     }
 
     private fun updateGasLevel() {

@@ -1,6 +1,9 @@
 package com.amongas.amongas
 
+import org.threeten.bp.LocalDateTime
+
 data class RegistroGas(
-    val hora: String,
+    val fechaHora: LocalDateTime,
     val valor: Int
 )
+

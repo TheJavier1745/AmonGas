@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import org.threeten.bp.format.DateTimeFormatter
 
 class RegistroAdapter(private val registros: List<RegistroGas>) :
     RecyclerView.Adapter<RegistroAdapter.RegistroViewHolder>() {
@@ -24,7 +25,9 @@ class RegistroAdapter(private val registros: List<RegistroGas>) :
 
     override fun onBindViewHolder(holder: RegistroViewHolder, position: Int) {
         val registro = registros[position]
-        holder.hora.text = "Hora: ${registro.hora}"
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+        val fechaStr = registro.fechaHora.format(formatter)
+        holder.hora.text = "Fecha: $fechaStr"
         holder.valor.text = "Valor: ${registro.valor} ppm"
 
         when {
