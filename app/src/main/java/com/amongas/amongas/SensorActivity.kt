@@ -11,6 +11,7 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.random.Random
 
 class SensorActivity : BaseActivity() {
@@ -52,6 +53,8 @@ class SensorActivity : BaseActivity() {
         updateGasLevel()
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNav.selectedItemId = R.id.nav_home
+
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_settings -> {
@@ -66,6 +69,7 @@ class SensorActivity : BaseActivity() {
                 else -> false
             }
         }
+
     }
 
     private fun updateGasLevel() {
@@ -79,30 +83,26 @@ class SensorActivity : BaseActivity() {
                 gasValues.add(gasLevel.toFloat())
                 if (gasValues.size > 10) gasValues.removeAt(0)
 
-                // Crear un dataset por segmento (con valores visibles al final)
                 val dataSets = mutableListOf<ILineDataSet>()
                 for (i in 0 until gasValues.size - 1) {
                     val entryStart = Entry(i.toFloat(), gasValues[i])
                     val entryEnd = Entry((i + 1).toFloat(), gasValues[i + 1])
 
                     val segmentColor = when {
-                        gasValues[i + 1] <= 249 -> getColor(R.color.green)
+                        gasValues[i + 1] <= 249f -> getColor(R.color.green)
                         gasValues[i + 1] in 250f..499f -> getColor(R.color.yellow)
                         else -> getColor(R.color.red)
                     }
 
                     val segmentDataSet = LineDataSet(listOf(entryStart, entryEnd), "").apply {
-                        setDrawValues(true)              // ✅ Mostrar valor
-                        setDrawCircles(true)             // ✅ Círculo en punto
-                        valueTextSize = 10f              // ✅ Tamaño del valor
+                        setDrawValues(true)
+                        setDrawCircles(true)
+                        valueTextSize = 10f
                         circleRadius = 4f
                         color = segmentColor
                         setCircleColor(segmentColor)
                         lineWidth = 3f
                     }
-
-                    // Solo mostrar valor del último punto del segmento
-                    segmentDataSet.setDrawValues(true)
 
                     dataSets.add(segmentDataSet)
                 }
@@ -110,7 +110,6 @@ class SensorActivity : BaseActivity() {
                 chartGasLevels.data = LineData(dataSets)
                 chartGasLevels.invalidate()
 
-                // Actualizar estado visual
                 when {
                     gasLevel <= 249 -> {
                         tvStatus.text = "Estado: Normal"
@@ -129,7 +128,7 @@ class SensorActivity : BaseActivity() {
                     }
                 }
 
-                handler.postDelayed(this, 2000)
+                handler.postDelayed(this, 5000)
             }
         }, 0)
     }
