@@ -26,10 +26,23 @@ class SensorActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sensor)
 
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+
+
         tvGasLevel = findViewById(R.id.tvGasLevel)
         tvStatus = findViewById(R.id.tvStatus)
         imageStatus = findViewById(R.id.imageStatus)
         chartGasLevels = findViewById(R.id.chartGasLevels)
+
+        val tvSensorName = findViewById<TextView>(R.id.tvSensorName)
+
+        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        val sensorName = prefs.getString("sensor_name", "Sensor")
+        tvSensorName.text = sensorName
+        supportActionBar?.title = sensorName // (si estás usando Toolbar también)
+
 
         // Configurar gráfico
         chartGasLevels.description.isEnabled = false
@@ -69,11 +82,31 @@ class SensorActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNav.selectedItemId = R.id.nav_home
+    }
+
     private fun updateGasLevel() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 val gasLevel = Random.nextInt(0, 1001)
-                tvGasLevel.text = "Nivel de gas: $gasLevel"
+
+                // Leer preferencia para mostrar como porcentaje
+                // Leer preferencia para mostrar como porcentaje
+                val prefss = getSharedPreferences("settings", MODE_PRIVATE)
+                val showPercentage = prefss.getBoolean("show_percentage", false)
+
+
+                val gasText = if (showPercentage) {
+                    val porcentaje = gasLevel / 10.0f
+                    "Nivel de gas: %.1f%%".format(porcentaje)
+                } else {
+                    "Nivel de gas: $gasLevel"
+                }
+                tvGasLevel.text = gasText
+
                 timeStep += 1f
 
                 // Guardar el nuevo valor, mantener solo los últimos 10

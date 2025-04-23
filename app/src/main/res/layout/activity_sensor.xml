@@ -6,6 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@android:color/white"
+        app:title="Sensor" />
+
     <!-- Contenido centrado -->
     <LinearLayout
         android:orientation="vertical"
@@ -14,6 +22,16 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvSensorName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensor"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/tvGasLevel"

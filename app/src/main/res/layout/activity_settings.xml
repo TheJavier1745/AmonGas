@@ -1,32 +1,106 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="24dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_soft">
 
-    <Switch
-        android:id="@+id/switchAlerts"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@android:color/white"
+        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:title="Configuración" />
+
+    <!-- Contenido desplazable -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Switch
+                android:id="@+id/switchAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="Activar alertas de gas" />
+
+            <TextView
+                android:text="Nivel de alerta (umbral)"
+                android:layout_marginTop="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <SeekBar
+                android:id="@+id/seekBarThreshold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="1000"
+                android:progress="500" />
+
+            <TextView
+                android:id="@+id/tvThresholdValue"
+                android:text="Umbral: 500"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- Nuevo Switch para mostrar en porcentaje -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+
+            <Switch
+                android:id="@+id/switchPorcentaje"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="Mostrar datos como porcentaje" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
+
+            <TextView
+                android:text="Nombre del sensor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/editSensorName"
+                android:hint="Ej: Sensor cocina"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1" />
+
+            <Button
+                android:id="@+id/btnGuardarNombre"
+                android:text="Guardar nombre"
+                android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Menú inferior fijo -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:text="Activar alertas de gas" />
-
-    <TextView
-        android:text="Nivel de alerta (umbral)"
-        android:layout_marginTop="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <SeekBar
-        android:id="@+id/seekBarThreshold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="1000"
-        android:progress="500" />
-
-    <TextView
-        android:id="@+id/tvThresholdValue"
-        android:text="Umbral: 500"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:background="@android:color/white"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/nav_selector"
+        app:itemTextColor="@color/nav_selector"
+        app:labelVisibilityMode="labeled"
+        app:elevation="8dp" />
 </LinearLayout>
