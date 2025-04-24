@@ -20,7 +20,7 @@ Software
     + LiquidCrystal_I2C
     + WiFi
     + HTTPClient
-Cuenta en Firebase con un Realtime Database
+    + Cuenta en Firebase con un Realtime Database
 ### Pasos de Instalación
 
 #### 1. Clonar el Repositorio
