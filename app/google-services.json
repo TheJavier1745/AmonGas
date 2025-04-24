@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "589634086138",
+    "firebase_url": "https://amongas-e74c6-default-rtdb.firebaseio.com",
+    "project_id": "amongas-e74c6",
+    "storage_bucket": "amongas-e74c6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:589634086138:android:9a82c136faf0d907385543",
+        "android_client_info": {
+          "package_name": "com.amongas.amongas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd36_GVGwc177UwshaWIC1HLVhiO1Jen4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
