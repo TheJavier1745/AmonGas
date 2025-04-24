@@ -7,7 +7,7 @@ Este proyecto permite monitorear niveles de gas (LPG) en tiempo real usando un s
 ## Instalación y Configuración
 
 ### Requisitos Previos
-Hardware
+Hardware y Software
 - ESP32
 - Sensor MQ-6
 - Pantalla LCD I2C 16x2
