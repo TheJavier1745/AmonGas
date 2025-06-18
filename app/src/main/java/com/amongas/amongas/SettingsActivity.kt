@@ -1,5 +1,6 @@
 package com.amongas.amongas
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -7,7 +8,9 @@ import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.UUID
 
 class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +23,31 @@ class SettingsActivity : BaseActivity() {
         val tvThreshold = findViewById<TextView>(R.id.tvThresholdValue)
 
         val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        val btnForgetWifi = findViewById<Button>(R.id.btnForgetWifi)
 
+        btnForgetWifi.setOnClickListener {
+            val adapter = BluetoothAdapter.getDefaultAdapter()
+            val device = adapter?.bondedDevices?.find { it.name == "ConfiguraGas" }
+            val uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
+
+            if (device != null) {
+                try {
+                    val socket = device.createRfcommSocketToServiceRecord(uuid)
+                    socket.connect()
+                    val outputStream = socket.outputStream
+                    outputStream.write("BORRAR;\n".toByteArray())
+                    outputStream.flush()
+                    socket.close()
+
+                    Toast.makeText(this, "✅ WiFi olvidada", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(this, "❌ Error al enviar comando", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "Dispositivo no emparejado", Toast.LENGTH_SHORT).show()
+            }
+        }
         // ✅ Cargar valores guardados
         switchAlerts.isChecked = prefs.getBoolean("alerts_enabled", true)
         switchPorcentaje.isChecked = prefs.getBoolean("show_percentage", false)
