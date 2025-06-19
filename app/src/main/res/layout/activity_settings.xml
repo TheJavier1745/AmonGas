@@ -92,7 +92,7 @@
                 android:id="@+id/btnForgetWifi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Olvidar Wi-Fi"
+                android:text="Gestionar Wifi"
                 android:layout_marginTop="16dp" />
         </LinearLayout>
     </ScrollView>

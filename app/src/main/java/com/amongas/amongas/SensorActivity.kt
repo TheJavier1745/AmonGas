@@ -5,18 +5,21 @@ import android.media.MediaPlayer
 import android.os.*
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.*
-import com.jakewharton.threetenabp.AndroidThreeTen
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
 class SensorActivity : BaseActivity() {
+
     private lateinit var tvGasLevel: TextView
     private lateinit var tvStatus: TextView
     private lateinit var imageStatus: ImageView
@@ -25,9 +28,9 @@ class SensorActivity : BaseActivity() {
 
     private val gasValues = mutableListOf<Float>()
     private var timeStep = 0f
+    private var ultimaHoraConexion: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidThreeTen.init(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sensor)
 
@@ -88,17 +91,28 @@ class SensorActivity : BaseActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.children.firstOrNull()?.let { ultimo ->
                     val valor = ultimo.child("valor").getValue(Double::class.java)?.toFloat() ?: 0f
+                    val timestampRaw = ultimo.child("timestamp").getValue(Long::class.java)
 
-                    // Generar timestamp local automáticamente (zona horaria Chile)
-                    val fechaChile = LocalDateTime.now(ZoneId.of("America/Santiago"))
-                    val timestamp = fechaChile.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
+                    val timestamp = if (timestampRaw != null) {
+                        val fecha = LocalDateTime.ofInstant(
+                            Instant.ofEpochMilli(timestampRaw),
+                            ZoneId.of("America/Santiago")
+                        )
+                        fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
+                    } else {
+                        LocalDateTime.now(ZoneId.of("America/Santiago"))
+                            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
+                    }
 
+                    ultimaHoraConexion = timestamp
                     updateUI(valor.toInt(), timestamp)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                tvGasLevel.text = "Error al leer datos"
+                val fallback = ultimaHoraConexion ?: "Sin conexión"
+                Toast.makeText(this@SensorActivity, "❌ Error de conexión", Toast.LENGTH_SHORT).show()
+                updateUI(0, fallback)
             }
         })
     }
@@ -111,7 +125,7 @@ class SensorActivity : BaseActivity() {
             val porcentaje = gasLevel / 10.0f
             "Nivel de gas: %.1f%%".format(porcentaje)
         } else {
-            "Nivel de gas: $gasLevel ppm\n$timestamp"
+            "Nivel de gas: $gasLevel ppm\nÚltima conexión: $timestamp"
         }
         tvGasLevel.text = gasText
 
