@@ -2,6 +2,8 @@ package com.amongas.amongas
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -11,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.UUID
+import androidx.appcompat.app.AlertDialog
 
 class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,23 +34,58 @@ class SettingsActivity : BaseActivity() {
             val uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
 
             if (device != null) {
-                try {
-                    val socket = device.createRfcommSocketToServiceRecord(uuid)
-                    socket.connect()
-                    val outputStream = socket.outputStream
-                    outputStream.write("BORRAR;\n".toByteArray())
-                    outputStream.flush()
-                    socket.close()
-
-                    Toast.makeText(this, "✅ WiFi olvidada", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toast.makeText(this, "❌ Error al enviar comando", Toast.LENGTH_SHORT).show()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, "Permiso de Bluetooth requerido", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
                 }
+
+                // Paso 1: Mostrar diálogo
+                val view = layoutInflater.inflate(R.layout.dialog_wifi_input, null)
+                val ssidInput = view.findViewById<EditText>(R.id.inputSsid)
+                val passInput = view.findViewById<EditText>(R.id.inputPass)
+
+                val dialog = AlertDialog.Builder(this)
+                    .setTitle("Nueva conexión WiFi")
+                    .setView(view)
+                    .setPositiveButton("Enviar") { _, _ ->
+                        val newSsid = ssidInput.text.toString()
+                        val newPass = passInput.text.toString()
+
+                        Thread {
+                            try {
+                                val socket = device.createRfcommSocketToServiceRecord(uuid)
+                                socket.connect()
+
+                                val outputStream = socket.outputStream
+                                val command = "BORRAR;SSID:$newSsid;PASS:$newPass;\n"
+                                outputStream.write(command.toByteArray())
+                                outputStream.flush()
+                                socket.close()
+
+                                runOnUiThread {
+                                    Toast.makeText(this, "✅ Nueva WiFi enviada", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                runOnUiThread {
+                                    Toast.makeText(this, "❌ Error al enviar nueva WiFi", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }.start()
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .create()
+
+                dialog.show()
             } else {
                 Toast.makeText(this, "Dispositivo no emparejado", Toast.LENGTH_SHORT).show()
             }
         }
+
+
+
+
         // ✅ Cargar valores guardados
         switchAlerts.isChecked = prefs.getBoolean("alerts_enabled", true)
         switchPorcentaje.isChecked = prefs.getBoolean("show_percentage", false)
