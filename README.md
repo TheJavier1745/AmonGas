@@ -1,107 +1,123 @@
-### Manual de Instalación y Ejecución – Amongas
+# Manual de Instalación y Ejecución – Amongas
 
-Amongas es un sistema de monitoreo de gas portátil basado en ESP32 y una aplicación Android, conectado a Firebase para registrar y visualizar los niveles de gas.
-
-### Requisitos
-
-#### Hardware
-
-* Placa **ESP32 DevKit**
-* Sensor **MQ-6**
-* Pantalla LCD **I2C 16x2**
-* Módulo buzzer pasivo
-* Cableado básico
-
-#### Software
-
-* **Arduino IDE** (v2.0+ recomendado)
-* **Plataforma ESP32 para Arduino**
-* **Firebase Realtime Database** (proyecto configurado)
-* **Android Studio**
-* **Dispositivo Android** con Android 8.0 o superior
+**Amongas** es un sistema de monitoreo de gas portátil basado en ESP32 y una aplicación Android, conectado a Firebase para registrar y visualizar los niveles de gas.
 
 ---
 
-### Configuración del ESP32
+## Requisitos
 
-1. **Instalar librerías necesarias** en el Arduino IDE:
+### Hardware
+
+- ESP32 DevKit v1  
+- Sensor de gases MQ-6  
+- Pantalla LCD 16x2 con interfaz I2C  
+- Zumbador pasivo  
+- Protoboard y cables Dupont  
+
+### Software
+
+- Arduino IDE (versión 2.0 o superior)  
+- Plataforma ESP32 instalada en el IDE  
+- Android Studio (versión estable)  
+- Cuenta en Firebase Console  
+- Dispositivo Android físico con Android 8.0 (API 26) o superior  
+
+---
+
+## Instalación del Firmware en el ESP32
+
+1. Abre **Arduino IDE** y selecciona la placa `ESP32 Dev Module` desde el menú **Herramientas**.
+
+2. Instala las siguientes bibliotecas desde el Gestor de Librerías:
 
 ```
-LiquidCrystal_I2C
-MQUnifiedsensor
-BluetoothSerial
-Preferences
-FirebaseESP32
+LiquidCrystal_I2C  
+MQUnifiedsensor  
+FirebaseESP32  
+BluetoothSerial  
+Preferences  
 FirebaseJson
 ```
 
-2. **Configurar el archivo del ESP32:**
-
-   * Abre el archivo `.ino` del ESP32 (por ejemplo: `amongas.ino`)
-   * Asegúrate de tener definidas las siguientes constantes:
+3. Clona o abre el archivo `amongas.ino` y configura las siguientes constantes al inicio del archivo:
 
 ```cpp
 #define API_KEY "TU_API_KEY_FIREBASE"
-#define DATABASE_URL "https://TU-URL.firebaseio.com"
+#define DATABASE_URL "https://TU_PROYECTO.firebaseio.com"
 ```
 
-3. **Sube el código** al ESP32 mediante USB.
+4. Conecta el ESP32 vía USB y sube el código desde Arduino IDE.
+
+5. Abre el Monitor Serial para verificar que el dispositivo arranque correctamente y espere conexión WiFi o datos por Bluetooth.
 
 ---
 
-### Instalación de la App Android
+## Instalación de la Aplicación Android
 
 1. Clona este repositorio:
 
 ```bash
-git clone https://github.com/TheJavier1745/amongas.git
+git clone https://github.com/usuario/amongas.git
 ```
 
 2. Abre el proyecto en **Android Studio**.
 
-3. Revisa los siguientes archivos para personalizar las claves:
+3. Importa el archivo `google-services.json` dentro de la carpeta `/app`.
 
-   * `google-services.json` (debes descargarlo desde Firebase Console)
-   * `AndroidManifest.xml` (asegúrate de tener permisos de Bluetooth e Internet)
+4. Verifica que en `AndroidManifest.xml` estén los siguientes permisos:
 
-4. Compila y ejecuta la app en un dispositivo Android (emulador no recomendado).
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.BLUETOOTH"/>
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+```
 
----
-
-### Vinculación de Dispositivo
-
-* La primera vez que se abre la app, si no hay WiFi guardada, el dispositivo entra en modo **Bluetooth** (`ConfiguraGas`)
-* Desde la app, presiona **"Vincular dispositivo"** y envía los datos de red WiFi.
-* El ESP32 se reiniciará y conectará automáticamente.
+5. Compila y ejecuta la app en un **dispositivo Android físico** (el emulador no es recomendable por limitaciones de Bluetooth).
 
 ---
 
-### Firebase Setup
+## Vinculación del Dispositivo
 
-1. Crea un nuevo proyecto en [Firebase Console](https://console.firebase.google.com/)
-2. Habilita **Realtime Database** y copia la URL.
-3. En la pestaña de autenticación, habilita **Anonymous sign-in** (opcional).
-4. Copia tu `API Key` y la `Database URL` en el código del ESP32.
+- Al iniciar la app, si no hay red WiFi configurada, se solicitará vincular el dispositivo vía Bluetooth.  
+- El dispositivo ESP32 aparecerá como **"ConfiguraGas"**.  
+- Ingresa el SSID y contraseña de tu red WiFi desde la app.  
+- El ESP32 se reiniciará y se conectará automáticamente a Internet.
 
 ---
 
-### Variables de Entorno (si aplica)
+## Configuración del Entorno Firebase
 
-Si usas entorno de producción/desarrollo:
+1. Accede a [Firebase Console](https://console.firebase.google.com/) y crea un nuevo proyecto.
+
+2. Activa **Realtime Database** y copia la URL del proyecto.
+
+3. En la sección **Autenticación**, habilita el método **Inicio de sesión anónimo**.
+
+4. Copia la **API Key** del proyecto y reemplázala en el archivo `.ino` del ESP32.
+
+---
+
+## Variables de Entorno (opcional)
+
+Si trabajas con múltiples entornos, puedes usar variables de entorno para mantener tus claves seguras:
 
 ```env
-# .env (solo si se maneja desde Android gradle)
 API_KEY=xxx
 FIREBASE_URL=xxx
 ```
 
-> ¡OJO! Este proyecto **no requiere `npm install` ni `docker`**.
+---
+
+## Consideraciones Finales
+
+- Este sistema **no utiliza Docker ni npm**.  
+- Está diseñado para funcionar con hardware embebido (ESP32) y aplicaciones móviles nativas (Android Studio).  
+- Para proyectos más complejos, se recomienda almacenar las credenciales en archivos separados o como variables de entorno.  
 
 ---
 
-### Verificación
+## Verificación
 
-Al ejecutar todo correctamente:
-
-* El ESP32 mostrará el estado de conexión y valores en LCD.
-* La app mostrará el nivel de gas, gráficos históricos y alerta si el gas sobrepasa el umbral definido.
+El ESP32 debe mostrar el estado de conexión y valores del sensor en la pantalla LCD.  
+La app debe mostrar el nivel de gas en tiempo real y alertar si el nivel supera el umbral configurado.  
